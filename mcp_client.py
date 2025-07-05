@@ -1,32 +1,20 @@
-import asyncio
-import websockets
-import json
+import socket
 
-async def mcp_call(ws, method, params=None, req_id=1):
-    req = {
-        "jsonrpc": "2.0",
-        "method": method,
-        "id": req_id
-    }
-    if params:
-        req["params"] = params
-    await ws.send(json.dumps(req))
-    resp = await ws.recv()
-    return json.loads(resp)
+HOST = 'localhost'
+PORT = 9091
 
-async def main():
-    uri = "ws://localhost:8080/mcp"
-    async with websockets.connect(uri) as ws:
-        # Handshake
-        handshake = await mcp_call(ws, "mcp.handshake", req_id=1)
-        print("Handshake:", handshake["result"])
-        # Interactive user query
+def start_client():
+    print("🔵 MCP Client started")
+    print("Ask me anything (e.g., 'latest tech news' or 'movies released today')\nType 'exit' to quit.\n")
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+        client.connect((HOST, PORT))
         while True:
-            user_input = input("\nAsk anything (or type 'exit'): ").strip()
-            if user_input.lower() == "exit":
+            query = input("🧑 You: ")
+            client.sendall(query.encode())
+            if query.lower() == "exit":
                 break
-            resp = await mcp_call(ws, "get_info", {"query": user_input}, req_id=2)
-            print("Answer:", resp.get("result", {}).get("answer", resp.get("error", "")))
+            response = client.recv(8192).decode()
+            print(f"\n🤖 Server:\n{response}\n")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    start_client()
