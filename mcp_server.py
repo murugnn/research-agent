@@ -3,13 +3,16 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import yfinance as yf
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # take environment variables from .env
+
+TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+NEWSDATA_API_KEY = os.getenv('NEWSDATA_API_KEY')
 
 HOST = 'localhost'
 PORT = 9091
-
-# Insert your API keys here
-TMDB_API_KEY = 'de3a9cf3e8c995193b73dec220e930f5'         # https://www.themoviedb.org/
-NEWSDATA_API_KEY = 'pub_8dc428a72b0f441aba193e0507bf8e5f' # https://newsdata.io/
 
 def get_latest_news():
     """Get latest news headlines using NewsData.io API."""
